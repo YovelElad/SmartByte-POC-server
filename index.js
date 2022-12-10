@@ -1,6 +1,9 @@
-require('./mdl');
+const axios= require('axios');
+const SensiboClient = require('sensibo-sdk');
+require('dotenv');
 
 const express = require('express');
+const { setACState } = require('./sensibo-api-code');
 const app = express();
 const port = process.env.port || 8080;
 
@@ -12,36 +15,51 @@ app.all('*', (req, res, next) => {
 
 app.use(express.json());
 
-// app.get('/login', (req, res) => res.send('login page'));
-// app.post('/contact', (req, res) => res.json({ firstName: 'Yovel' }));
-// app.put('/contact', (req, res) => res.send('update contact'));
-// app.delete('/contact', (req, res) => res.send('delete contact'));
+setInterval(async()=>{
+    try {
+    const response = await axios({
+        url: "http://10.100.102.54/temperature",
+        method: "get",
+    });
+    // res.status(200).json(response.data);
+    if(response.data>=20){
+        setACState();
+    }
+} catch (err) {
+    // res.status(500).json({ message: err });
+    console.log(err);
+}},5000)
 
-app.post('/saveMusic', (req, res) => {
-    const { songs = [] } = req.body;
-
-    console.log("Songs are: ", songs)
-    res.json({ seccuss: 1 })
-})
-
-
-app.get('/playmusic/:music_id', (req, res) => {
-    res.send(`
-    <!doctype html>
-    <html>
-        <head>
-            <title>${req.params.music_id}</title>
-        </head>
-        <body></body>
-    </html>
-    `)
-})
-
-
+// app.get("/temperature", async (req, res) => {
+// 	try {
+//         const response = await axios({
+//             url: "http://10.100.102.54/temperature",
+// 			method: "get",
+// 		});
+// 		res.status(200).json(response.data);
+//         if(response.data>=20){
+//             setACState();
+//         }
+// 	} catch (err) {
+// 		res.status(500).json({ message: err });
+// 	}
+// });
 
 
 app.all('*', (req, res) => res.send('Global handler'));
 
+
+const getSensibo= async() =>{
+    
+    
+    console.log(process.env.SENSIBO_API_KEY);
+    const client = new SensiboClient(process.env.SENSIBO_API_KEY); //initialize with API key
+    console.log(client);
+    const pods = await client.getPods()
+    const measurements = await pods[0].getMeasurements() //batteryVoltage, humidity, etc
+    const acState = await pods[0].getAcState() // on, fanLevel, swing etc
+    const updateResult = await pods[0].setAcState({targetTemperature: 24, temperatureUnit: 'C'})
+}
 
 
 app.listen(port);
