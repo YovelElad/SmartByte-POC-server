@@ -1,6 +1,6 @@
 const axios= require('axios');
 const SensiboClient = require('sensibo-sdk');
-require('dotenv');
+require('dotenv').config();
 
 const express = require('express');
 const { setACState } = require('./sensibo-api-code');
@@ -18,7 +18,7 @@ app.use(express.json());
 setInterval(async()=>{
     try {
     const response = await axios({
-        url: "http://10.100.102.54/temperature",
+        url: `${process.env.SENSOR_URL}/temperature`,
         method: "get",
     });
     // res.status(200).json(response.data);
@@ -27,13 +27,13 @@ setInterval(async()=>{
     }
 } catch (err) {
     // res.status(500).json({ message: err });
-    console.log(err);
-}},5000)
+    console.log(err + "Cant read from esp32's sensor");
+}},8000);
 
-// app.get("/temperature", async (req, res) => {
+// app.get('/temperature',setInterval(async(req, res) => {
 // 	try {
 //         const response = await axios({
-//             url: "http://10.100.102.54/temperature",
+//             url:`${process.env.SENSOR_URL}/temperature`,
 // 			method: "get",
 // 		});
 // 		res.status(200).json(response.data);
@@ -43,24 +43,10 @@ setInterval(async()=>{
 // 	} catch (err) {
 // 		res.status(500).json({ message: err });
 // 	}
-// });
+// },8000));
 
 
 app.all('*', (req, res) => res.send('Global handler'));
-
-
-const getSensibo= async() =>{
-    
-    
-    console.log(process.env.SENSIBO_API_KEY);
-    const client = new SensiboClient(process.env.SENSIBO_API_KEY); //initialize with API key
-    console.log(client);
-    const pods = await client.getPods()
-    const measurements = await pods[0].getMeasurements() //batteryVoltage, humidity, etc
-    const acState = await pods[0].getAcState() // on, fanLevel, swing etc
-    const updateResult = await pods[0].setAcState({targetTemperature: 24, temperatureUnit: 'C'})
-}
-
 
 app.listen(port);
 console.log('listening to port', port)
