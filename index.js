@@ -15,20 +15,56 @@ app.all('*', (req, res, next) => {
 
 app.use(express.json());
 
-setInterval(async()=>{
-    try {
-    const response = await axios({
-        url: `${process.env.SENSOR_URL}/temperature`,
-        method: "get",
-    });
-    // res.status(200).json(response.data);
-    if(response.data>=20){
-        setACState();
+const fs = require('fs');
+const readline = require('readline');
+  
+
+const file = readline.createInterface({
+    input: fs.createReadStream('../SmartByte-Interpreter/functions.txt'),
+    output: process.stdout,
+    terminal: false
+});
+
+file.on('line', (line) => {
+    if(line == "Turn On The AC") {
+        TrunOnTheAc()
     }
-} catch (err) {
-    // res.status(500).json({ message: err });
-    console.log(err + "Cant read from esp32's sensor");
-}},8000);
+});
+
+
+function TrunOnTheAc() {
+    console.log("Turn on the ac");
+    //     try {
+    //     const response = await axios({
+    //         url: `${process.env.SENSOR_URL}/temperature`,
+    //         method: "get",
+    //     });
+    //     // res.status(200).json(response.data);
+    //     if(response.data>=20){
+    //         console.log("Activte AC");
+    //         // setACState();
+    //     }
+    // } catch (err) {
+    //     // res.status(500).json({ message: err });
+    //     console.log(err + "Cant read from esp32's sensor");
+    // };
+}
+
+
+// setInterval(async()=>{
+//     try {
+//     const response = await axios({
+//         url: `${process.env.SENSOR_URL}/temperature`,
+//         method: "get",
+//     });
+//     // res.status(200).json(response.data);
+//     if(response.data>=20){
+//         setACState();
+//     }
+// } catch (err) {
+//     // res.status(500).json({ message: err });
+//     console.log(err + "Cant read from esp32's sensor");
+// }},8000);
 
 // app.get('/temperature',setInterval(async(req, res) => {
 // 	try {
