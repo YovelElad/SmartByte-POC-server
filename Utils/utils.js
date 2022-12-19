@@ -50,7 +50,7 @@ function startInterval() {
         activePythonScript("/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter",["temperature", i],
         "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
         activePythonScript("/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter",['RUN("examp.txt")'],
-        "../SmartByte-Interpreter","shell1.py","../SmartByte-POC-server");
+        "../SmartByte-Interpreter","shell.py","../SmartByte-POC-server");
         // activeFunctions(funcitnons)
         clearFunctionTextFile()
     },1000);
