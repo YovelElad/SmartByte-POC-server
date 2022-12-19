@@ -46,19 +46,16 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
     process.chdir(currDir)
 }
 
-let i=0;
 function startInterval() {
     setInterval(async()=>{
-        i++;
         const temperature = await getTemperature();
-        //const temperature = "5000";
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", temperature],
         "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,['RUN("examp.txt")'],
         "../SmartByte-Interpreter","shell.py","../SmartByte-POC-server");
         readFunctionFileAndExectue();
         clearFunctionTextFile()
-    },1000);
+    },10000);
 }
 
 function clearFunctionTextFile() {
