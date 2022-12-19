@@ -6,12 +6,8 @@ module.exports =  getTemperature = async() => {
             url: `${process.env.SENSOR_URL}/temperature`,
             method: "get",
         });
-        // if(response.data>=20){
-        //     setACState();
-        // }
         return response.data;
     } catch (err) {
-        // res.status(500).json({ message: err });
         console.log(err + "Cant read from esp32's sensor");
     }
 }
