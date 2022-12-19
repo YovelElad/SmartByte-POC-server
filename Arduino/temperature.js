@@ -1,3 +1,4 @@
+const axios = require('axios');
 
 module.exports =  getTemperature = async() => {
     try {
@@ -5,7 +6,6 @@ module.exports =  getTemperature = async() => {
             url: `${process.env.SENSOR_URL}/temperature`,
             method: "get",
         });
-        res.status(200).json(response.data);
         // if(response.data>=20){
         //     setACState();
         // }
