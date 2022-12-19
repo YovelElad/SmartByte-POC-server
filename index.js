@@ -18,6 +18,7 @@ const port = process.env.port || 8080;
 
 
 app.all('*', (req, res, next) => {
+    utils.startInterval()
     next();
 })
 
@@ -25,12 +26,6 @@ app.use(express.json());
 
 const fs = require('fs');
 const readline = require('readline');
-
-
-setInterval(async()=>{
-    const temperature = await getTemperature();
-    console.log(temperature);
-},1000);
 
 app.post('/rules', (req, res) => {
     const path = process.env.RULES_FILE_PATH;
@@ -49,8 +44,6 @@ app.post('/rules', (req, res) => {
     }
 });
 
-
-app.all('*', (req, res) => res.send('Global handler'));
 
 app.listen(port);
 console.log('listening to port', port)
