@@ -14,6 +14,4 @@ module.exports =  getTemperature = async() => {
         // res.status(500).json({ message: err });
         console.log(err + "Cant read from esp32's sensor");
     }
-    
-    
 }
