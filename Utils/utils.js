@@ -9,13 +9,13 @@ function readFunctionFileAndExectue() {
         if (line == "Turn On The AC") {
             setACState();
         }
-    });    
+    });
 }
 
 /**
  * @param {string} tempVal The string
  */
-function insertValueOfTempSensor(tempVal, localScriptPath, paramaters, interpreterDir, pythonFileName, currDir) {
+function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonFileName, currDir) {
     const PythonShell = require('python-shell').PythonShell;
 
     var options = {
@@ -39,10 +39,28 @@ function insertValueOfTempSensor(tempVal, localScriptPath, paramaters, interpret
     });
 
     process.chdir(currDir)
+}
 
+let i=0;
+function startInterval() {
+    setInterval(async()=>{
+        i++;
+        // const temperature = await getTemperature();
+        const temperature = "5000";
+        activePythonScript("/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter",["temperature", i],
+        "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
+        activePythonScript("/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter",['RUN("examp.txt")'],
+        "../SmartByte-Interpreter","shell1.py","../SmartByte-POC-server");
+        // activeFunctions(funcitnons)
+        clearFunctionTextFile()
+    },1000);
+}
+
+function clearFunctionTextFile() {
+    const fs = require('fs')
+    fs.truncate('../SmartByte-Interpreter/functions.txt', 0, function(){console.log('done')})
 }
 
 module.exports = {
-    readFunctionFileAndExectue,
-    insertValueOfTempSensor
+    startInterval
 }
