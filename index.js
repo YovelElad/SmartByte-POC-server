@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const express = require('express');
 const { setACState } = require('./sensibo-api-code');
+const  getTemperature  = require('./Arduino/temperature');
 const app = express();
 const cors = require("cors");
 
@@ -72,20 +73,32 @@ setInterval(async () => {
     }
 }, 8000);
 
-// app.get('/temperature', setInterval(async (req, res) => {
-//     try {
-//         const response = await axios({
-//             url: `${process.env.SENSOR_URL}/temperature`,
-//             method: "get",
-//         });
-//         res.status(200).json(response.data);
-//         if (response.data >= 20) {
-//             setACState();
-//         }
-//     } catch (err) {
-//         res.status(500).json({ message: err });
-//     }
-// }, 8000));
+
+setInterval(async()=>{
+    const temperature = await getTemperature();
+    console.log(temperature);
+},1000);
+
+app.get('/temperature',setInterval(async(req, res) => {
+	try {
+        const response = await axios({
+            url:`${process.env.SENSOR_URL}/temperature`,
+			method: "get",
+		});
+		res.status(200).json(response.data);
+        if(response.data>=20){
+            setACState();
+        }
+	} catch (err) {
+		res.status(500).json({ message: err });
+	}
+},8000));
+
+
+app.all('*', (req, res) => res.send('Global handler'));
+
+app.listen(port);
+console.log('listening to port', port)
 
 // /**
 //  * @param {string} tempVal The string
