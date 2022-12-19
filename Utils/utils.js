@@ -47,9 +47,9 @@ function startInterval() {
         i++;
         // const temperature = await getTemperature();
         const temperature = "5000";
-        activePythonScript("/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter",["temperature", i],
+        activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", i],
         "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
-        activePythonScript("/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter",['RUN("examp.txt")'],
+        activePythonScript(process.env.PATH_TO_Interpreter_DIR,['RUN("examp.txt")'],
         "../SmartByte-Interpreter","shell.py","../SmartByte-POC-server");
         // activeFunctions(funcitnons)
         clearFunctionTextFile()
