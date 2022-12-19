@@ -20,7 +20,7 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
 
     var options = {
         mode: 'text',
-        pythonPath: '/usr/bin/python3',
+        pythonPath: process.env.PYTHON_PATH,
         pythonOptions: ['-u'],
         scriptPath: localScriptPath,
         args: paramaters
