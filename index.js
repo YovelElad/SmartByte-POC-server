@@ -85,28 +85,55 @@ app.all('*', (req, res) => res.send('Global handler'));
 app.listen(port);
 console.log('listening to port', port)
 
+// /**
+//  * @param {string} tempVal The string
+//  */
+// function insertValueOfTempSensor(tempVal, localScriptPath, paramaters, interpreterDir, pythonFileName, currDir) {
+//     const PythonShell = require('python-shell').PythonShell;
+
+//     var options = {
+//         mode: 'text',
+//         pythonPath: '/usr/bin/python3',
+//         pythonOptions: ['-u'],
+//         scriptPath: '/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter',
+//         args: ['temperature', tempVal]
+//     };
+
+//     process.chdir('../SmartByte-Interpreter');
+
+//     PythonShell.run('setValueBySensor.py', options, function (err, results) {
+//         if (err)
+//             throw err;
+//         console.log('Changed temp value');
+//     });
+
+//     process.chdir('../SmartByte-POC-server')
+
+// }
+
+
 /**
  * @param {string} tempVal The string
  */
-function insertValueOfTempSensor(tempVal) {
+ function insertValueOfTempSensor(tempVal, localScriptPath, paramaters, interpreterDir, pythonFileName, currDir) {
     const PythonShell = require('python-shell').PythonShell;
 
     var options = {
         mode: 'text',
         pythonPath: '/usr/bin/python3',
         pythonOptions: ['-u'],
-        scriptPath: '/Users/amiravidan/Documents/finalProject/SmartByte-Interpreter',
-        args: ['temperature', tempVal]
+        scriptPath: localScriptPath,
+        args: paramaters
     };
 
-    process.chdir('../SmartByte-Interpreter');
+    process.chdir(interpreterDir);
 
-    PythonShell.run('setValueBySensor.py', options, function (err, results) {
+    PythonShell.run(pythonFileName, options, function (err, results) {
         if (err)
             throw err;
         console.log('Changed temp value');
     });
 
-    process.chdir('../SmartByte-POC-server')
+    process.chdir(currDir)
 
 }
