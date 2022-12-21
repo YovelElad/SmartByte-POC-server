@@ -1,3 +1,21 @@
+const getTemperature = require('../Arduino/temperature');
+const { setACState } = require('../sensibo-api-code');
+const fs = require('fs');
+const readline = require('readline');
+const { get } = require('http');
+
+function getDegreesFromLine(degree) {
+        if(degree){
+            let isDigitInLine= degree.match(/(\d+)/);
+            if(isDigitInLine){
+               return (isDigitInLine[0]);
+            } else{
+                return "None";
+            }
+        }
+    
+}
+
 function readFunctionFileAndExectue() {
     const file = readline.createInterface({
         input: fs.createReadStream('../SmartByte-Interpreter/functions.txt'),
@@ -6,8 +24,16 @@ function readFunctionFileAndExectue() {
     });
     
     file.on('line', (line) => {
-        if (line == "Turn On The AC") {
-            setACState();
+        let degrees=getDegreesFromLine(line);
+
+        if(degrees==="None"){
+            if (line === `Turn On The AC`) {
+                setACState(degrees);          // turn the AC on
+             }
+        } else{
+            if(line === `AC On ${degrees}`){
+                setACState(parseFloat(degrees));          // turn the AC on specific temperature.
+            }
         }
     });
 }
@@ -41,24 +67,20 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
     process.chdir(currDir)
 }
 
-let i=0;
 function startInterval() {
     setInterval(async()=>{
-        i++;
-        // const temperature = await getTemperature();
-        const temperature = "5000";
-        activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", i],
+        const temperature = await getTemperature();
+        activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", temperature],
         "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,['RUN("examp.txt")'],
         "../SmartByte-Interpreter","shell.py","../SmartByte-POC-server");
-        // activeFunctions(funcitnons)
+        readFunctionFileAndExectue();
         clearFunctionTextFile()
-    },1000);
+    },10000);
 }
 
 function clearFunctionTextFile() {
-    const fs = require('fs')
-    fs.truncate('../SmartByte-Interpreter/functions.txt', 0, function(){console.log('done')})
+    fs.truncate('../SmartByte-Interpreter/functions.txt', 0, function(){console.log('done')});
 }
 
 module.exports = {
