@@ -76,7 +76,7 @@ function startInterval() {
         "../SmartByte-Interpreter","shell.py","../SmartByte-POC-server");
         readFunctionFileAndExectue();
         clearFunctionTextFile()
-    },10000);
+    },5000);
 }
 
 function clearFunctionTextFile() {

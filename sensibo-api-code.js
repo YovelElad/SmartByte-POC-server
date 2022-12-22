@@ -14,33 +14,32 @@ exports.getACState = async () => {
 
 }
 
-exports.setACState = async (targetTemperature = "None", temperatureUnit = "Celsius") => {
+exports.setACState = async (targetTemperature = "None", temperatureUnit = "C") => {
     try {
         const currentState = await this.getACState();
         if (currentState === false) {
             if (targetTemperature !== "None") {
-                console.log('dasdsaadsadasdsada');
-                console.log(typeof(targetTemperature));
-                console.log(temperatureUnit);
-                const response = await axios.post(`https://home.sensibo.com/api/v2/pods/${process.env.DEVICE_ID}/acStates?apiKey=${process.env.SENSIBO_API_KEY}`, {
-                    "acState": {
-                        "on": true,
-                        "targetTemperature": targetTemperature,
-                        "temperatureUnit": temperatureUnit
-                    }
-                })
-
-            } else {
                 const response = await axios.post(`https://home.sensibo.com/api/v2/pods/${process.env.DEVICE_ID}/acStates?apiKey=${process.env.SENSIBO_API_KEY}`, {
                     "acState": {
                         "on": true
                     }
                 })
+
+            } else {   // set ac on and update the temprture
+                const response = await axios.post(`https://home.sensibo.com/api/v2/pods/${process.env.DEVICE_ID}/acStates?apiKey=${process.env.SENSIBO_API_KEY}`, {
+                    "acState": {
+                        "on": true
+                    }
+                })
+                const res = await axios.patch(`https://home.sensibo.com/api/v2/pods/${process.env.DEVICE_ID}/acStates/targetTemperature?apiKey=${process.env.SENSIBO_API_KEY}`, { "newValue": `${targetTemperature}` });
+
+                res.data.headers['Content-Type'];    //application/json;charset=utf-8
+                console.log(res.data);
             }
 
         }
     } catch (err) {
-        console.log(err + "Ivalid read from Sensibo");
+        console.log(err + "Invalid read from Sensibo");
     }
 }
 
