@@ -1,9 +1,7 @@
-const axios = require('axios');
-const SensiboClient = require('sensibo-sdk');
 require('dotenv').config();
-
+const fs = require('fs');
+const readline = require('readline');
 const express = require('express');
-const { setACState } = require('./sensibo-api-code');
 const utils = require('./Utils/utils');
 const app = express();
 const cors = require("cors");
@@ -23,8 +21,7 @@ app.all('*', (req, res, next) => {
 
 app.use(express.json());
 
-const fs = require('fs');
-const readline = require('readline');
+
 
 app.post('/rules', (req, res) => {
     const path = process.env.RULES_FILE_PATH;

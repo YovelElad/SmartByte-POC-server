@@ -1,3 +1,9 @@
+
+const getTemperature= require('../Arduino/temperature');
+const { setACState } = require('../sensibo-api-code');
+const readline = require('readline');
+const fs = require('fs');
+
 function readFunctionFileAndExectue() {
     const file = readline.createInterface({
         input: fs.createReadStream('../SmartByte-Interpreter/functions.txt'),
@@ -7,7 +13,9 @@ function readFunctionFileAndExectue() {
     
     file.on('line', (line) => {
         if (line == "Turn On The AC") {
+            console.log("befoe setAc state");
             setACState();
+            return true;
         }
     });
 }
@@ -41,19 +49,17 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
     process.chdir(currDir)
 }
 
-let i=0;
+
 function startInterval() {
     setInterval(async()=>{
-        i++;
-        // const temperature = await getTemperature();
-        const temperature = "5000";
-        activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", i],
+         const temperature = await getTemperature();
+        activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", temperature],
         "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,['RUN("examp.txt")'],
         "../SmartByte-Interpreter","shell.py","../SmartByte-POC-server");
-        // activeFunctions(funcitnons)
+        readFunctionFileAndExectue()
         clearFunctionTextFile()
-    },1000);
+    },8000);
 }
 
 function clearFunctionTextFile() {
