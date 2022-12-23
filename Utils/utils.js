@@ -63,8 +63,7 @@ function startInterval() {
 }
 
 function clearFunctionTextFile() {
-    const fs = require('fs')
-    fs.truncate('../SmartByte-Interpreter/functions.txt', 0, function(){console.log('done')})
+    fs.truncate('../SmartByte-Interpreter/functions.txt', 0, function(){console.log('done')});
 }
 
 module.exports = {

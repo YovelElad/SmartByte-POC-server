@@ -1,11 +1,10 @@
 require('dotenv').config();
 const fs = require('fs');
-const readline = require('readline');
 const express = require('express');
 const utils = require('./Utils/utils');
 const app = express();
 const cors = require("cors");
-
+const fs = require('fs');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,7 +14,7 @@ const port = process.env.port || 8080;
 
 
 app.all('*', (req, res, next) => {
-    utils.startInterval()
+    utils.startInterval();
     next();
 })
 
@@ -28,8 +27,7 @@ app.post('/rules', (req, res) => {
     const newRule = req.body.data;
     try {
         if (fs.existsSync(path) && newRule) {
-            console.log(newRule);
-            fs.writeFileSync(path, newRule);
+            fs.appendFileSync(path, newRule);
             res.json({ message: "File is created succefully." });
             res.sendStatus(200);
         }
@@ -39,6 +37,19 @@ app.post('/rules', (req, res) => {
         res.sendStatus(500);
     }
 });
+
+app.get('/state',async(req,res) =>{
+    try{
+        
+        const response= await getACState();
+        res.json({message:`${response}`});
+        res.sendStatus(200);
+    } catch(err){
+        console.log(err);
+        res.json({ message: "Invalid device"});
+        res.sendStatus(500);
+    }
+})
 
 
 app.listen(port);
