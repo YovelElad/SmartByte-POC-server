@@ -50,8 +50,8 @@ let i=0;
 function startInterval() {
     setInterval(async()=>{
         i++;
-        const temperature = await getTemperature();
-        //const temperature = "5000";
+        // const temperature = await getTemperature();
+        const temperature = "5000";
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", temperature],
         "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,['RUN("examp.txt")'],
