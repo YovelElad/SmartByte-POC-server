@@ -32,7 +32,7 @@ exports.setACState = async (targetTemperature = "None", temperatureUnit = "C") =
                     }
                 })
                 const res = await axios.patch(`https://home.sensibo.com/api/v2/pods/${process.env.DEVICE_ID}/acStates/targetTemperature?apiKey=${process.env.SENSIBO_API_KEY}`, { "newValue": `${targetTemperature}` });
-
+                // updates the tAC's temperature state
                 res.data.headers['Content-Type'];    //application/json;charset=utf-8
                 console.log(res.data);
             }

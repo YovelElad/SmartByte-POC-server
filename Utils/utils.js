@@ -1,8 +1,9 @@
-const getTemperature = require('../Arduino/temperature');
+const getTemperature = require('../Arduino/sensorsData');
+const getHumidity = require('../Arduino/sensorsData');
 const { setACState } = require('../sensibo-api-code');
 const fs = require('fs');
 const readline = require('readline');
-const { get } = require('http');
+const PythonShell = require('python-shell').PythonShell;
 
 function getDegreesFromLine(degree) {
         if(degree){
@@ -42,8 +43,6 @@ function readFunctionFileAndExectue() {
  * @param {string} tempVal The string
  */
 function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonFileName, currDir) {
-    const PythonShell = require('python-shell').PythonShell;
-
     var options = {
         mode: 'text',
         pythonPath: process.env.PYTHON_PATH,
@@ -58,7 +57,7 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
         try {
             if (err)
                 throw err;
-            console.log('Changed temp value');
+            //console.log('Changed temp value');
         } catch (err) {
             console.log(err);
         }
@@ -70,17 +69,20 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
 function startInterval() {
     setInterval(async()=>{
         const temperature = await getTemperature();
+        const humidity=await getHumidity();
+        // activePythonScript(process.env.PATH_TO_Interpreter_DIR,["humidity", humidity],
+        // "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,["temperature", temperature],
         "../SmartByte-Interpreter","setValueBySensor.py","../SmartByte-POC-server");
         activePythonScript(process.env.PATH_TO_Interpreter_DIR,['RUN("examp.txt")'],
         "../SmartByte-Interpreter","shell.py","../SmartByte-POC-server");
         readFunctionFileAndExectue();
         clearFunctionTextFile()
-    },5000);
+    },8000);
 }
 
 function clearFunctionTextFile() {
-    fs.truncate('../SmartByte-Interpreter/functions.txt', 0, function(){console.log('done')});
+    fs.truncate('../SmartByte-Interpreter/functions.txt', 0, function(){console.log('Cleared the functions.txt file')});
 }
 
 module.exports = {
