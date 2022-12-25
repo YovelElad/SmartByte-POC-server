@@ -20,6 +20,7 @@ app.all('*', (req, res, next) => {
 app.use(express.json());
 
 
+// Post http methods
 
 app.post('/rules', (req, res) => {
     const path = process.env.RULES_FILE_PATH;
@@ -28,25 +29,49 @@ app.post('/rules', (req, res) => {
         if (fs.existsSync(path) && newRule) {
             fs.appendFileSync(path, newRule);
             res.json({ message: "File is created succefully." });
-            res.sendStatus(200);
+
         }
     } catch (error) {
         console.error(error);
         res.json({ message: "Error reading the file" });
-        res.sendStatus(500);
     }
 });
+
+
+//Get Http methods
+app.get('/',async(req,res) =>{
+    try{
+        res.json({message:`SmartByte Server`});
+    } catch(err){
+        console.log(err);
+        res.json({ message: "Invalid request"});
+    }
+})
+
+
 
 app.get('/state',async(req,res) =>{
     try{
         
         const response= await getACState();
         res.json({message:`${response}`});
-        res.sendStatus(200);
     } catch(err){
         console.log(err);
         res.json({ message: "Invalid device"});
-        res.sendStatus(500);
+    }
+})
+
+app.get('/sensors/rules',async(req,res) =>{
+    try{
+        const humidityValue= utils.syncReadFile(`${process.env.RULES_FILE_PATH}`);
+        console.log(humidityValue);
+        if(humidityValue!=-1){
+            res.json({message:`${humidityValue}`});
+        } else{
+            throw "Invalid humiidty Value";
+        }
+    } catch(err){
+        res.json({ message: err});
     }
 })
 

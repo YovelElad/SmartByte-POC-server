@@ -1,9 +1,30 @@
 
-const getTemperature = require('../Arduino/temperature');
-const { setACState } = require('../sensibo-api-code');
+const getTemperature = require('../ArduinoService/temperatureService');
+const getHumidity = require('../ArduinoService/humidityService');
+const { setACState } = require('../SensiboService/sensibo-api-code');
 const readline = require('readline');
 const fs = require('fs');
+const {readFileSync, promises: fsPromises} = require('fs');
 
+// ✅ read file SYNCHRONOUSLY
+function syncReadFile(filename) {
+    const contents = readFileSync(filename, 'utf-8');
+    let humidityValue="";
+  
+    const arr = contents.split(/\r?\n/);
+    let lines=arr.toString();
+    indexOFHumidityRule= lines.indexOf("humidity >");
+    if(indexOFHumidityRule){
+        let humidityLine= lines.slice(indexOFHumidityRule,indexOFHumidityRule+22);
+        humidityValue=humidityLine.match(/(\d+)/);
+        if(humidityValue){
+            return (humidityValue[0]);
+        } 
+    }
+    return -1;
+  }
+  
+ 
 function getDegreesFromLine(degree) {
     if (degree) {
         let isDigitInLine = degree.match(/(\d+)/);
@@ -13,7 +34,6 @@ function getDegreesFromLine(degree) {
             return "None";
         }
     }
-
 }
 
 function readFunctionFileAndExectue() {
@@ -25,7 +45,6 @@ function readFunctionFileAndExectue() {
 
     file.on('line', (line) => {
         let degrees=getDegreesFromLine(line);
-
         if(degrees==="None"){
             if (line === `Turn On The AC`) {
                 setACState(degrees);          // turn the AC on
@@ -37,6 +56,8 @@ function readFunctionFileAndExectue() {
         }
     });
 }
+
+
 
 /**
  * @param {string} tempVal The string
@@ -58,7 +79,6 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
         try {
             if (err)
                 throw err;
-            console.log('Changed temp value');
         } catch (err) {
             console.log(err);
         }
@@ -68,17 +88,19 @@ function activePythonScript(localScriptPath, paramaters, interpreterDir, pythonF
 }
 
 
-let i = 19;
 function startInterval() {
     setInterval(async () => {
-        //const temperature = await getTemperature();
-        activePythonScript(process.env.PATH_TO_Interpreter_DIR, ["temperature", ++i],
+        let temperature = await getTemperature();
+        let humidity= await getHumidity();
+        activePythonScript(process.env.PATH_TO_Interpreter_DIR, ["temperature", temperature],
+            "../SmartByte-Interpreter", "setValueBySensor.py", "../SmartByte-POC-server");
+            activePythonScript(process.env.PATH_TO_Interpreter_DIR, ["humidity", humidity],
             "../SmartByte-Interpreter", "setValueBySensor.py", "../SmartByte-POC-server");
         activePythonScript(process.env.PATH_TO_Interpreter_DIR, ['RUN("examp.txt")'],
             "../SmartByte-Interpreter", "shell.py", "../SmartByte-POC-server");
         readFunctionFileAndExectue();
         clearFunctionTextFile();
-    }, 5000);
+    }, 9000);
 }
 
 function clearFunctionTextFile() {
@@ -86,5 +108,5 @@ function clearFunctionTextFile() {
 }
 
 module.exports = {
-    startInterval
+    startInterval,syncReadFile
 }
